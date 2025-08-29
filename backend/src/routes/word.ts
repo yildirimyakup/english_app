@@ -6,6 +6,8 @@ import {
   uploadFile,
   updateWord,
   deleteWord,
+  exportJson,
+  exportJsonUserWord,
 } from "../controllers/word.controller.js";
 import { upload } from "../config/multer.config.js";
 
@@ -18,6 +20,7 @@ router.post("/upload-audio", upload.single("audio"), uploadFile);
 //GET
 router.get("/", getAllWord); // Tüm kelimeler
 router.get("/:id", findWord); // Tek kelime getir
+router.get("/export/json", exportJson);
 
 //PUT
 router.put("/:id", updateWord);

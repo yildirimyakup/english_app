@@ -1,9 +1,10 @@
 import express, { Router, Request, Response } from "express";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
-import corsMiddleware from "./middlewares/cors..js";
+import corsMiddleware from "./middlewares/cors.js";
 import auth from "./routes/auth.js";
 import word from "./routes/word.js";
+import userWord from "./routes/user-word.route.js";
 const router = Router();
 
 dotenv.config();
@@ -23,5 +24,6 @@ router.get("/", (req: Request, res: Response) => {
 });
 app.use("/api/auth", auth);
 app.use("/api/words", word);
+app.use("/api/user-words", userWord);
 
 export default app;

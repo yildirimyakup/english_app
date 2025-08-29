@@ -5,6 +5,7 @@ import { findWordById } from "../services/words/find-word-by-id.service.js";
 import { uploadFileService } from "../services/words/upload-audio.service.js";
 import { updateWordService } from "../services/words/update-word.service.js";
 import { deleteWordService } from "../services/words/delete-word.service.js";
+import { exportJsonService } from "../services/words/export-json.service.js";
 
 export const getAllWord = async (req: Request, res: Response) => {
   try {
@@ -20,7 +21,7 @@ export const findWord = async (req: Request, res: Response) => {
     const result = await findWordById(req.params.id);
     res.status(201).json(result);
   } catch (err: any) {
-    res.status(400).json({ message: err });
+    res.status(500).json({ message: err });
   }
 };
 
@@ -67,7 +68,7 @@ export const uploadFile = async (req: Request, res: Response) => {
     const result = await uploadFileService(req.file);
     res.status(201).json(result);
   } catch (err: any) {
-    res.status(400).json({ message: err });
+    res.status(500).json({ message: err });
   }
 };
 
@@ -78,7 +79,7 @@ export const updateWord = async (req: Request, res: Response) => {
     const result = await updateWordService(updateWord, id);
     res.status(201).json(result);
   } catch (err: any) {
-    res.status(400).json({ message: err });
+    res.status(500).json({ message: err });
   }
 };
 export const deleteWord = async (req: Request, res: Response) => {
@@ -87,6 +88,15 @@ export const deleteWord = async (req: Request, res: Response) => {
     const result = await deleteWordService(id);
     res.status(201).json(result);
   } catch (err: any) {
-    res.status(400).json({ message: err });
+    res.status(500).json({ message: err });
+  }
+};
+
+export const exportJson = async (req: Request, res: Response) => {
+  try {
+    const result = await exportJsonService();
+    res.status(201).json(result);
+  } catch (err: any) {
+    res.status(500).json({ message: err });
   }
 };
