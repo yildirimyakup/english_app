@@ -12,13 +12,11 @@ export const register = async (req: Request, res: Response) => {
   try {
     const { email, password, name, surename } = req.body;
     const result = await registerUser(email, password, name, surename);
-    return res
-      .status(201)
-      .json({ message: "Kayıt başarılı. Lütfen e-postanızı onaylayın." });
+    res.status(201).json(result);
   } catch (err: any) {
     // Hata mesajlarını yakala
     const message = err.message || "Sunucu hatası";
-    return res.status(400).json({ error: message });
+    res.status(400).json({ message: message });
   }
 };
 

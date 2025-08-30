@@ -11,6 +11,7 @@ import authMiddleware from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
+console.log("burada");
 //POST
 router.post("/register", register);
 router.post("/login", login);

@@ -67,6 +67,9 @@ const registerUser = async (
      <a href="${verifyUrl}">${verifyUrl}</a>`
   );
 
-  return { message: "Kayıt başarılı. Lütfen emailinizi doğrulayın." };
+  return {
+    status: 1,
+    message: "Kayıt başarılı. Lütfen emailinizi doğrulayın.",
+  };
 };
 export default registerUser;
