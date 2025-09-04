@@ -1,6 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './auth.slice';
 import feedbackReducer from './feedback.slice';
+import levelReducer from './levels/levelSlice'; // ✅ yeni eklenen
+import loggerReducer from './logs/loger.slice';
+
 import { api } from './api';
 export const store = configureStore({
   reducer: {
@@ -8,6 +11,8 @@ export const store = configureStore({
     auth: authReducer,
     feedback: feedbackReducer, // ✅ buraya ekle
     [api.reducerPath]: api.reducer,
+    levels: levelReducer, // ✅ buraya ekledik
+    logger: loggerReducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware().concat(api.middleware),

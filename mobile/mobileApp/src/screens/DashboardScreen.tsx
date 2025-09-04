@@ -30,7 +30,13 @@ export default function DashboardScreen() {
       <Text style={{ fontSize: 20, marginBottom: 20 }}>Dashboard 🚀</Text>
       <Button title="Bireysel Oyna" onPress={() => {}} />
       <Button title="Çoklu Oyna" onPress={() => {}} />
-      <Button title="Profil" onPress={() => {}} />
+      <Button
+        title="LevelMap"
+        onPress={() => {
+          navigation.replace('LevelMap');
+        }}
+      />
+      <Button title="Debug Mode" onPress={() => navigation.navigate('Debug')} />
       <Button title="Çıkış Yap" onPress={handleLogout} color="red" />
     </SafeAreaView>
   );

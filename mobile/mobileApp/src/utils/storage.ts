@@ -22,7 +22,18 @@ export const getToken = async (): Promise<string | null> => {
 export const removeToken = async () => {
   try {
     await AsyncStorage.removeItem(TOKEN_KEY);
+    await AsyncStorage.removeItem('userId');
   } catch (error) {
     console.error('Token silinemedi:', error);
   }
+};
+const LAST_SYNC_KEY = 'last_sync';
+
+export const saveLastSync = async () => {
+  const now = new Date().toISOString();
+  await AsyncStorage.setItem(LAST_SYNC_KEY, now);
+};
+
+export const getLastSync = async (): Promise<string | null> => {
+  return await AsyncStorage.getItem(LAST_SYNC_KEY);
 };

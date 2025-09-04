@@ -5,6 +5,7 @@ import {
   View,
   TouchableOpacity,
   ImageBackground,
+  Button,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -12,12 +13,11 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useDispatch } from 'react-redux';
 import Input from '../components/auth/Input';
 import PrimaryButton from '../components/auth/PrimaryButton';
-import { saveToken } from '../utils/storage';
-import { useLoginMutation } from '../store/api';
 import { AppDispatch } from '../store/store';
-import { login } from '../store/auth.slice';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { showFeedback } from '../store/feedback.slice';
+import { handleLogin } from '../store/thunks/auth.thunks';
+import { logInfo, logError } from '../utils/loger';
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -29,36 +29,40 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(false);
-  const [loginMutation, { isLoading }] = useLoginMutation();
+  const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
 
-  const handleLogin = async () => {
+  const handleSubmit = async () => {
+    setIsLoading(true);
     try {
-      const result = await loginMutation({ email, password }).unwrap();
-      if (result?.token) {
-        await saveToken(result.token);
-        dispatch(login());
-        dispatch(showFeedback({ message: result.message, type: 'success' }));
-        navigation.replace('Dashboard');
-      }
+      logInfo('Deneme');
+
+      const res: any = await dispatch(handleLogin(email, password));
+      dispatch(showFeedback({ message: res.message, type: 'success' }));
+      navigation.replace('Dashboard');
     } catch (err: any) {
-      dispatch(showFeedback({ message: err.data.message, type: 'error' }));
+      logError('Giriş Hatası');
+      dispatch(
+        showFeedback({
+          message: '❌ Giriş başarısız: ' + (err?.message || 'Bilinmeyen hata'),
+          type: 'error',
+        }),
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <ImageBackground
-      source={require('../../assets/bg.png')} // 🎨 Buraya oyun tarzı gradient görsel ekleyin
+      source={require('../../assets/bg.png')}
       style={styles.background}
     >
       <SafeAreaView style={styles.container}>
-        {/* Başlık */}
         <Text style={styles.title}>🎯</Text>
-
         <Text style={styles.title}>Word Battle</Text>
         <Text style={styles.subtitle}>Kelime Düellosuna Katıl!</Text>
 
-        {/* Inputlar */}
         <View style={styles.inputWrapper}>
           <Input value={email} onChangeText={setEmail} placeholder="E-mail" />
           <Input
@@ -68,8 +72,8 @@ export default function LoginScreen() {
             secureTextEntry
           />
         </View>
+
         <View style={styles.rowLinks}>
-          {/* Beni Hatırla */}
           <TouchableOpacity
             style={styles.rememberRow}
             onPress={() => setRemember(!remember)}
@@ -80,7 +84,6 @@ export default function LoginScreen() {
             <Text style={styles.rememberText}>Beni Hatırla</Text>
           </TouchableOpacity>
 
-          {/* Şifremi Unuttum */}
           <TouchableOpacity
             onPress={() => navigation.navigate('ForgotPassword')}
           >
@@ -88,16 +91,17 @@ export default function LoginScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Beni Hatırla */}
-
-        {/* Login butonu */}
         <PrimaryButton
-          title={'Giriş Yap'}
-          onPress={handleLogin}
+          title="Giriş Yap"
+          onPress={handleSubmit}
           loading={isLoading}
         />
 
-        {/* Alt Linkler */}
+        <Button
+          title="Debug Mode"
+          onPress={() => navigation.navigate('Debug')}
+        />
+
         <View style={styles.bottomLinks}>
           <TouchableOpacity onPress={() => navigation.navigate('Register')}>
             <Text style={styles.linkText}>Hesabın yok mu? Kayıt Ol</Text>
@@ -109,31 +113,20 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-    resizeMode: 'cover',
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 24,
-  },
+  background: { flex: 1, resizeMode: 'cover' },
+  container: { flex: 1, justifyContent: 'center', paddingHorizontal: 24 },
   rowLinks: {
     marginHorizontal: 10,
-    flexDirection: 'row', // yan yana
-    justifyContent: 'space-between', // biri sola, biri sağa yaslansın
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
   },
-
   title: {
     fontSize: 36,
     fontWeight: '900',
     color: '#fff',
     textAlign: 'center',
     marginBottom: 8,
-    textShadowColor: 'rgba(0,0,0,0.3)',
-    textShadowOffset: { width: 1, height: 2 },
-    textShadowRadius: 4,
   },
   subtitle: {
     fontSize: 16,
@@ -159,9 +152,7 @@ const styles = StyleSheet.create({
     borderColor: '#fff',
     marginRight: 8,
   },
-  checkboxActive: {
-    backgroundColor: '#6A11CB',
-  },
+  checkboxActive: { backgroundColor: '#6A11CB' },
   rememberText: { fontSize: 14, color: '#fff' },
   bottomLinks: { marginTop: 25, alignItems: 'center', gap: 12 },
   linkText: {

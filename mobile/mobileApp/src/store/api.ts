@@ -1,12 +1,22 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+
+import { apiURLConfig } from '../services/api/index.service';
+
+const { API_URL } = apiURLConfig();
 
 export const api = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'http://127.0.0.1:4000/api', // 🔹 backend adresi buraya
+    baseUrl: API_URL, // 🔹 backend adresi buraya
+    prepareHeaders: async headers => {
+      const token = await AsyncStorage.getItem('user_token'); // mobilde AsyncStorage
+      if (token) headers.set('Authorization', `Bearer ${token}`);
+      return headers;
+    },
   }),
   endpoints: builder => ({
-    login: builder.mutation<any, any>({
+    login: builder.mutation<any, { email: string; password: string }>({
       query: credentials => ({
         url: 'auth/login',
         method: 'POST',
@@ -33,6 +43,25 @@ export const api = createApi({
         body: data,
       }),
     }),
+
+    getWordsExport: builder.query<any, string | void>({
+      query: updatedAfter =>
+        updatedAfter
+          ? `words/export/json?updatedAfter=${updatedAfter}`
+          : 'words/export/json',
+    }),
+    getLevelsExport: builder.query<any, string | void>({
+      query: updatedAfter =>
+        updatedAfter
+          ? `levels/export/json?updatedAfter=${updatedAfter}`
+          : 'levels/export/json',
+    }),
+    getUserWords: builder.query<any, any>({
+      query: userId => `/user-words/${userId}`,
+    }),
+    getUserLevels: builder.query<any, any>({
+      query: userId => `/user-levels/${userId}`,
+    }),
   }),
 });
 
@@ -40,4 +69,10 @@ export const {
   useLoginMutation,
   useRegisterMutation,
   useForgotPasswordMutation,
+  useGetWordsExportQuery,
+  useGetLevelsExportQuery,
+  useLazyGetWordsExportQuery, // ✅ lazy query
+  useLazyGetLevelsExportQuery, // ✅ lazy query
+  useLazyGetUserWordsQuery,
+  useLazyGetUserLevelsQuery,
 } = api;
